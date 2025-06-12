@@ -42,7 +42,7 @@ def home():
           options: {
             scales: {
               x: { display: false },
-              y: { min: 0, max: 5 }
+              y: { min: 0, max: 3.5 }
             }
           }
         });
