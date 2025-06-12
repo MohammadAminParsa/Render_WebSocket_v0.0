@@ -21,7 +21,7 @@ def home():
     </head>
     <body>
       <h1>📡 Real-time Voltage Monitor</h1>
-      <canvas id="chart" width="400" height="200"></canvas>
+      <canvas id="chart" width="400" height="180"></canvas>
       <br>
       <button id="toggleBtn">Toggle</button>
       <p id="statusText">Status: OFF</p>
