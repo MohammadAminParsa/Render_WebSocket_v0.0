@@ -2,7 +2,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-latest_data = {}
+latest_data = {
+    "voltage": "0.00",
+    "status": "OFF"
+}
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -14,9 +17,11 @@ def upload():
 def latest():
     return jsonify(latest_data)
 
-@app.route('/')
-def root():
-    return "<h3>ESP32 Server is Online ✅</h3>"
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+@app.route('/control', methods=['GET', 'POST'])
+def control():
+    global latest_data
+    if request.method == 'POST':
+        latest_data['status'] = request.json.get('status', 'OFF')
+        return '', 200
+    else:
+        return jsonify({"status": latest_data['status']})
