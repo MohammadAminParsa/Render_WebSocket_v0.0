@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>مانیتورینگ اینورتر</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>ولتاژ اینورتر: <span id="voltage">--- V</span></h1>
+  <h2>وضعیت: <span id="status">نامشخص</span></h2>
+  <button onclick="toggleInverter(true)">روشن</button>
+  <button onclick="toggleInverter(false)">خاموش</button>
+
+  <script>
+    const socket = io();
+
+    socket.on('update_voltage', (data) => {
+      document.getElementById("voltage").innerText = data.voltage + " V";
+    });
+
+    socket.on('control_command', (data) => {
+      document.getElementById("status").innerText = data.on ? "روشن" : "خاموش";
+    });
+
+    function toggleInverter(state) {
+      socket.emit('switch_command', { on: state });
+    }
+  </script>
+</body>
+</html>
