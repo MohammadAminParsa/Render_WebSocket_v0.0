@@ -1,30 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>مانیتورینگ اینورتر</title>
+  <title>Solar Inverter Monitor</title>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>ولتاژ اینورتر: <span id="voltage">--- V</span></h1>
-  <h2>وضعیت: <span id="status">نامشخص</span></h2>
-  <button onclick="toggleInverter(true)">روشن</button>
-  <button onclick="toggleInverter(false)">خاموش</button>
+  <h1>Voltage Monitor</h1>
+  <canvas id="voltageChart" width="600" height="300"></canvas>
 
-  <script>
-    const socket = io();
+  <button onclick="sendCommand('ON')">Turn ON</button>
+  <button onclick="sendCommand('OFF')">Turn OFF</button>
 
-    socket.on('update_voltage', (data) => {
-      document.getElementById("voltage").innerText = data.voltage + " V";
-    });
-
-    socket.on('control_command', (data) => {
-      document.getElementById("status").innerText = data.on ? "روشن" : "خاموش";
-    });
-
-    function toggleInverter(state) {
-      socket.emit('switch_command', { on: state });
-    }
-  </script>
+  <script src="/static/js/main.js"></script>
 </body>
 </html>
