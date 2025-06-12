@@ -10,74 +10,108 @@ latest_data = {
 @app.route('/')
 def home():
     return '''
-    <html>
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
-    <title>ESP32 Realtime</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-      body { text-align: center; font-family: sans-serif; }
-      button { padding: 10px 20px; font-size: 16px; }
-    </style>
+        <meta charset="UTF-8">
+        <title>ESP32 Dashboard</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background: #f5f5f5;
+                text-align: center;
+            }
+            h1 {
+                color: #333;
+            }
+            canvas {
+                max-width: 100%;
+                height: 300px !important;
+                margin-bottom: 30px;
+                background: white;
+                border: 1px solid #ccc;
+            }
+            #toggleBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+                border: none;
+                cursor: pointer;
+                border-radius: 6px;
+            }
+            .on {
+                background: #28a745;
+                color: white;
+            }
+            .off {
+                background: #dc3545;
+                color: white;
+            }
+        </style>
     </head>
     <body>
-      <h1>📡 Real-time Voltage Monitor</h1>
-      <canvas id="chart" width="400" height="180"></canvas>
-      <br>
-      <button id="toggleBtn">Toggle</button>
-      <p id="statusText">Status: OFF</p>
+        <h1>🌡️ ESP32 Voltage Monitor</h1>
+        <canvas id="chart"></canvas>
+        <br>
+        <button id="toggleBtn" class="off">OFF</button>
 
-      <script>
-        let chartCtx = document.getElementById('chart').getContext('2d');
-        let chart = new Chart(chartCtx, {
-          type: 'line',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Voltage (V)',
-              data: [],
-              borderColor: 'blue',
-              fill: false
-            }]
-          },
-          options: {
-            scales: {
-              x: { display: false },
-              y: { min: 0, max: 3.5 }
-            }
-          }
-        });
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        <script>
+            const ctx = document.getElementById('chart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Voltage (V)',
+                        borderColor: 'blue',
+                        backgroundColor: 'lightblue',
+                        data: [],
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { suggestedMin: 0, suggestedMax: 3.5 }
+                    }
+                }
+            });
 
-        async function fetchData() {
-          const res = await fetch('/latest');
-          const data = await res.json();
-          const voltage = parseFloat(data.voltage);
-          const status = data.status;
+            const socket = io();
+            socket.on('voltage', function(data) {
+                const time = new Date().toLocaleTimeString();
+                chart.data.labels.push(time);
+                chart.data.datasets[0].data.push(data.voltage);
+                if (chart.data.labels.length > 20) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+                chart.update();
+            });
 
-          chart.data.labels.push('');
-          chart.data.datasets[0].data.push(voltage);
-          if (chart.data.labels.length > 20) {
-            chart.data.labels.shift();
-            chart.data.datasets[0].data.shift();
-          }
-          chart.update();
+            const toggleBtn = document.getElementById('toggleBtn');
+            toggleBtn.addEventListener('click', () => {
+                const newState = toggleBtn.classList.contains('on') ? 'OFF' : 'ON';
+                socket.emit('control', { status: newState });
+            });
 
-          document.getElementById("statusText").innerText = "Status: " + status;
-        }
-
-        setInterval(fetchData, 2000);
-
-        document.getElementById("toggleBtn").onclick = async () => {
-          let currentStatus = document.getElementById("statusText").innerText.includes("ON") ? "OFF" : "ON";
-          await fetch("/control", {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "status": currentStatus })
-          });
-        }
-      </script>
+            socket.on('status', function(data) {
+                if (data.status === 'ON') {
+                    toggleBtn.classList.remove('off');
+                    toggleBtn.classList.add('on');
+                    toggleBtn.textContent = 'ON';
+                } else {
+                    toggleBtn.classList.remove('on');
+                    toggleBtn.classList.add('off');
+                    toggleBtn.textContent = 'OFF';
+                }
+            });
+        </script>
     </body>
     </html>
     '''
+
 
 
 @app.route('/upload', methods=['POST'])
