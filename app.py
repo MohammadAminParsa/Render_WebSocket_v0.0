@@ -98,3 +98,10 @@ def control():
         return '', 200
     else:
         return jsonify({"status": latest_data['status']})
+
+import os
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 10000))  # اگر PORT تعریف نشده بود، 10000 استفاده می‌کنه
+    app.run(host='0.0.0.0', port=port)
+
