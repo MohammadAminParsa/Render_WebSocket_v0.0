@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head><title>WebSocket Test</title></head>
+<head>
+  <title>ESP32 Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin: 20px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+    #voltage { font-size: 24px; margin: 20px 0; }
+  </style>
+</head>
 <body>
-  <h1>WebSocket Test</h1>
-  <div id="log"></div>
-  <script>
-    let log = msg => { console.log(msg); document.getElementById('log').innerHTML += msg + '<br>'; };
+  <h1>📟 ESP32 Voltage Monitor</h1>
+  <p id="voltage">Voltage: --</p>
+  <canvas id="chart" width="400" height="200"></canvas>
+  <div>
+    <button onclick="sendCommand('ON')">🔌 Turn ON</button>
+    <button onclick="sendCommand('OFF')">⚡ Turn OFF</button>
+  </div>
 
-    let ws = new WebSocket("wss://" + location.host + "/ws");
-    ws.onopen = () => log("🟢 Connected to WebSocket");
-    ws.onmessage = ev => log("📥 " + ev.data);
-    ws.onclose = () => log("🔴 Disconnected");
-    ws.onerror = err => log("❌ " + err);
-  </script>
+  <script src="chart.js"></script>
 </body>
 </html>
