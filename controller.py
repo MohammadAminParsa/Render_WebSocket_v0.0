@@ -1,12 +1,13 @@
 # controller.py
-status = "ON"  # مقدار پیش‌فرض
+status = "ON"
 
 def get_status():
     return status
 
-def set_status(new_status):
+def set_status(s: str):
     global status
-    if new_status in ["ON", "OFF"]:
-        status = new_status
+    s = s.upper()
+    if s in ["ON", "OFF"]:
+        status = s
         return True
     return False
