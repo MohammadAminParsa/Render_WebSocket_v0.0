@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>Inverter Dashboard</title></head>
+<body>
+  <h1>Inverter Controller</h1>
+  <div>Voltage: <span id="voltage">--</span> V</div>
+  <button id="btnON">ON</button>
+  <button id="btnOFF">OFF</button>
+
+  <script>
+    const ws = new WebSocket(`ws://${location.host}`);
+    const voltageEl = document.getElementById('voltage');
+    ws.onopen = () => console.log('Connected to WS server');
+    ws.onmessage = evt => {
+      try {
+        const d = JSON.parse(evt.data);
+        if (typeof d.voltage !== 'undefined')
+          voltageEl.textContent = d.voltage;
+      } catch(e){}
+    };
+    document.getElementById('btnON').onclick = ()=>ws.send(JSON.stringify({command:'ON'}));
+    document.getElementById('btnOFF').onclick = ()=>ws.send(JSON.stringify({command:'OFF'}));
+  </script>
+</body>
+</html>
