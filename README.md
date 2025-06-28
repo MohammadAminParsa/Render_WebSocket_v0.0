@@ -1,5 +1,3 @@
-Sure! Here's a polished and complete `README.md` for your **WebSocket Server for ESP32** project, formatted in Markdown and enhanced with some fitting emojis:
-
 ```markdown
 # ⚡ WebSocket Server for ESP32
 
