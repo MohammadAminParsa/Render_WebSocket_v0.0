@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>ESP32 Monitor</title>
+</head>
+<body>
+  <h1>🔋 ولتاژ: <span id="voltage">{{ voltage }}</span> V</h1>
+  <h2>🟢 وضعیت: <span id="status">{{ status }}</span></h2>
+
+  <button onclick="sendStatus('ON')">روشن</button>
+  <button onclick="sendStatus('OFF')">خاموش</button>
+
+  <script>
+    setInterval(() => {
+      fetch("/data")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("voltage").innerText = data.voltage;
+          document.getElementById("status").innerText = data.status;
+        });
+    }, 1000);
+
+    function sendStatus(status) {
+      fetch("/status?status=" + status, { method: "POST" });
+    }
+  </script>
+</body>
+</html>
