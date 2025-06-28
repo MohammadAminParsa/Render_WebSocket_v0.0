@@ -143,7 +143,7 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 For support or collaboration:
 
 - GitHub Issues
-- your.email@example.com
+- mohammad.amin.parsa0082@gmail.com
 
 ---
 
