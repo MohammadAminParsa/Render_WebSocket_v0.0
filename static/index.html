@@ -1,29 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>ESP32 Monitor</title>
+  <meta charset="UTF-8">
+  <title>ESP32 Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    #status {
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>🔋 ولتاژ: <span id="voltage">{{ voltage }}</span> V</h1>
-  <h2>🟢 وضعیت: <span id="status">{{ status }}</span></h2>
-
-  <button onclick="sendStatus('ON')">روشن</button>
-  <button onclick="sendStatus('OFF')">خاموش</button>
+  <h2>ESP32 Dashboard</h2>
+  <p>Status: <span id="status">...</span></p>
+  <p>Voltage: <span id="voltage">0.000</span> V</p>
+  <canvas id="chart" width="400" height="200"></canvas>
 
   <script>
-    setInterval(() => {
-      fetch("/data")
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("voltage").innerText = data.voltage;
-          document.getElementById("status").innerText = data.status;
-        });
-    }, 1000);
+    let voltageData = [];
+    let timeLabels = [];
+    const maxPoints = 20;
 
-    function sendStatus(status) {
-      fetch("/status?status=" + status, { method: "POST" });
+    const ctx = document.getElementById('chart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: timeLabels,
+        datasets: [{
+          label: 'Voltage (V)',
+          data: voltageData,
+          borderColor: 'blue',
+          tension: 0.3,
+          fill: false
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: { display: true, text: 'Time' }
+          },
+          y: {
+            min: 0,
+            max: 5,
+            title: { display: true, text: 'Voltage (V)' }
+          }
+        }
+      }
+    });
+
+    async function pollData() {
+      try {
+        const res = await fetch("/data");
+        const json = await res.json();
+
+        document.getElementById("status").innerText = json.status;
+        document.getElementById("voltage").innerText = json.voltage;
+
+        const time = new Date().toLocaleTimeString();
+        if (voltageData.length >= maxPoints) {
+          voltageData.shift();
+          timeLabels.shift();
+        }
+
+        voltageData.push(parseFloat(json.voltage));
+        timeLabels.push(time);
+        chart.update();
+
+      } catch (e) {
+        console.log("❌ Failed to fetch data:", e);
+      }
     }
+
+    setInterval(pollData, 2000);
   </script>
 </body>
 </html>
