@@ -2,9 +2,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const app = express();
-
-// پورت ۵۰۰۰ پیش‌فرض Render است
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ server, path: "/ws" });
