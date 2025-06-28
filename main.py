@@ -1,5 +1,6 @@
 # main.py
 from fastapi import FastAPI, Query
+from fastapi import Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,14 +34,14 @@ def get_data():
     }
 
 @app.post("/data")
-def post_data(v: float = Query(...)):
-    voltage_str = f"{v:.3f}"
-    data.set_voltage(voltage_str)
+def post_data(v: str = Form(...)):  # توجه: تغییر از Query به Form
+    data.set_voltage(v)
     return {
         "message": "Voltage updated",
-        "voltage": voltage_str,
+        "voltage": v,
         "timestamp": datetime.utcnow().isoformat()
     }
+
 
 @app.post("/status")
 def post_status(status: str = Query(...)):
