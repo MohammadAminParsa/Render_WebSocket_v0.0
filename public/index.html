@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>WebSocket Test</title></head>
+<body>
+  <h1>WebSocket Test</h1>
+  <div id="log"></div>
+  <script>
+    let log = msg => { console.log(msg); document.getElementById('log').innerHTML += msg + '<br>'; };
+
+    let ws = new WebSocket("wss://" + location.host + "/ws");
+    ws.onopen = () => log("🟢 Connected to WebSocket");
+    ws.onmessage = ev => log("📥 " + ev.data);
+    ws.onclose = () => log("🔴 Disconnected");
+    ws.onerror = err => log("❌ " + err);
+  </script>
+</body>
+</html>
