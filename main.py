@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
@@ -41,7 +41,7 @@ def get_data():
 
 # ───────────── API ارسال ولتاژ توسط ESP32
 @app.post("/data")
-def post_data(v: float = Query(...)):
+def post_data(v: float = Form(...)):  # تغییر از Query به Form
     global voltage_value
     voltage_value = f"{v:.3f}"
     return {
